@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+
+function parsearJSON(texto)
+{
+var objeto_json=JSON.parse(texto);
+var t_min=objeto_json.main.temp_min;
+var t_max=objeto_json.main.temp_max;
+console.log("T. min: "+t_min+" T. max:"+t_max);
+
+
+}
+function cargarOyente()
+{
+var objeto_select=document.getElementById("combo_ciudades");
+objeto_select.onchange=function(){pedirClimaCiudad(this.value);};
+
+}
+
+function pedirClimaCiudad(ciudad)
+{
+var xhr=new XMLHttpRequest();
+xhr.onreadystatechange=function()
+{
+//1-Veo en que readyState estoy. Me interesa el 4
+//2-Vei en que status estiy. Me interesa el 200.
+if(this.readyState==4 && this.status==200)
+	{
+	//Tengo respuesta y todo ha ido OK
+	mostrarClima(this.responseText);
+	}
+
+}
+xhr.open("GET", "http://api.openweathermap.org/data/2.5/weather?q="+ciudad+"&appid=57703a7a9ab7b873a99116a3ea379748", true);
+xhr.send();
+
+}
+function mostrarClima(texto_json)
+{
+var objeto_json=JSON.parse(texto_json);
+var t_min=objeto_json.main.temp_min-273;
+var t_max=objeto_json.main.temp_max-273;
+var nombre_ciudad=objeto_json.name;
+var texto="En "+nombre_ciudad+" la t. minima son: "+t_min+"ºC y la t. max "+t_max+"ºC";
+document.getElementById("parrafo_clima").innerText=texto;
+}
+</script>
+</head>
+<body onload="cargarOyente();">
+
+<p id="parrafo_clima"></p>
+<select id="combo_ciudades" >
+	<option value="Madrid">Madrid</option>
+	<option value="Barcelona">Barcelona</option>
+	<option value="Valencia">Valencia</option>
+	
+</select>
+
+</body>
+</html>
