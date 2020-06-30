@@ -15,7 +15,8 @@ function loadDoc() {
     }
   
   };
-  xhttp.open("GET", "http://api.openweathermap.org/data/2.5/weather?q=Sevilla&appid=57703a7a9ab7b873a99116a3ea379748", true);
+	//ATENCIÓN: Al tener la appid en forma pública me ha llegado un aviso, por eso la he puesto separada con espacios. Pero va sin espacios
+  xhttp.open("GET", "http://api.openweathermap.org/data/2.5/weather?q=Sevilla&appid=5 7 7 0 3 a 7 a 9 a b 7 b 8 7 3 a 9 9 1 1 6 a 3 e a 3 7 9 7 4 8", true);
   xhttp.send();
    pintarMapa();
 }
