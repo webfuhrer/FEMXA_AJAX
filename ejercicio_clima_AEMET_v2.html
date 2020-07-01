@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+
+function parsearJSON(texto)
+{
+var objeto_json=JSON.parse(texto);
+var t_min=objeto_json.main.temp_min;
+var t_max=objeto_json.main.temp_max;
+console.log("T. min: "+t_min+" T. max:"+t_max);
+
+
+}
+function cargarOyente()
+{
+var objeto_select=document.getElementById("combo_ciudades");
+objeto_select.onchange=function(){pedirClimaCiudad(this.value);};
+
+}
+
+function pedirClima()
+{
+var xhr=new XMLHttpRequest();
+var cod_muni=document.getElementById("cod_muni").value;
+xhr.onreadystatechange=function()
+		{
+		
+		//1-Veo en que readyState estoy. Me interesa el 4
+		//2-VeO en que status estOY. Me interesa el 200.
+		if(this.readyState==4 && this.status==200)
+			{
+			//Tengo respuesta y todo ha ido OK
+			sacarDias(this.responseText);
+			}
+
+		}
+xhr.open("GET", "http://www.aemet.es/xml/municipios/localidad_"+cod_muni+".xml", true);
+xhr.send();
+
+}
+function sacarDias(texto)
+{
+var parseador=new DOMParser();
+var obj_xml=parseador.parseFromString(texto,"text/xml");
+var nombre=obj_xml.getElementsByTagName("nombre")[0].childNodes[0].nodeValue;
+var lista_dias=obj_xml.getElementsByTagName("dia");
+document.getElementById("municipio").innerText=nombre;
+for (i=0; i<lista_dias.length; i++)
+	{
+	var dia=lista_dias[i];
+	var fecha=dia.getAttribute("fecha");
+	//var hijos_temperatura=dia.getElementsByTagName("temperatura")[0].childNodes; Los nodos de texto también son hijos_temperatura
+	var t_maxima=dia.getElementsByTagName("temperatura")[0].getElementsByTagName("maxima")[0].childNodes[0].nodeValue;
+	var t_minima=dia.getElementsByTagName("temperatura")[0].getElementsByTagName("minima")[0].childNodes[0].nodeValue;
+	var fila=document.createElement("tr");
+	fila.innerHTML="<td>"+fecha+"</td><td>"+t_minima+"</td><td>"+t_maxima+"</td>";
+	document.getElementById("tabla").appendChild(fila);
+	//console.log("Fecha: "+lista_dias[i].getAttribute("fecha"));
+	}
+}
+</script>
+</head>
+<body >
+<input type="number" placeholder="Introduce el código del municipio" id="cod_muni">
+<h1 id="municipio"></h1>
+<table id="tabla">
+<tr>
+	<th>Día</th>
+	<th>Temperatura mínima</th>
+	<th>Temperatura máxima</th>
+</tr>
+</table>
+<button onclick="pedirClima();">Pedir clima</button>
+</body>
+</html>
