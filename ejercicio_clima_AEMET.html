@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+
+function parsearJSON(texto)
+{
+var objeto_json=JSON.parse(texto);
+var t_min=objeto_json.main.temp_min;
+var t_max=objeto_json.main.temp_max;
+console.log("T. min: "+t_min+" T. max:"+t_max);
+
+
+}
+function cargarOyente()
+{
+var objeto_select=document.getElementById("combo_ciudades");<
+objeto_select.onchange=function(){pedirClimaCiudad(this.value);};
+
+}
+
+function pedirClima()
+{
+var xhr=new XMLHttpRequest();
+xhr.onreadystatechange=function()
+{
+//1-Veo en que readyState estoy. Me interesa el 4
+//2-VeO en que status estOY. Me interesa el 200.
+if(this.readyState==4 && this.status==200)
+	{
+	//Tengo respuesta y todo ha ido OK
+	console.log(this.responseText);
+	}
+
+}
+xhr.open("GET", "http://www.aemet.es/xml/municipios/localidad_28007.xml", true);
+xhr.send();
+
+}
+
+</script>
+</head>
+<body >
+
+<p id="parrafo_clima" ></p>
+<button onclick="pedirClima();">Pedir clima</button>
+
+</body>
+</html>
