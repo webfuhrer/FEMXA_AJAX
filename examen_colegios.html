@@ -1,0 +1,125 @@
+<!--
+https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=json&file=0&filename=202311-0-colegios-publicos&mgmtid=78da52c974fb3410VgnVCM2000000c205a0aRCRD&preview=full
+1-Crea un html con un botón........2 punto
+2-Al clicar el botón se llama a una función que hace una petición AJAX...............2 puntos
+3-Se recibe el JSON.......................................................1 punto
+4-Se parsea al JSON y se extraen los nombres de los colegios(propiedad "title")......2 puntos
+5-Se parsea al JSON y se extraen la latitud y longitud..........................1 puntos
+6-Crea una tabla con las columnas latitud, longitud y nombre del colegios.......1 punto
+7-Crea un mapa con 2 columnas: Nombre del colegio y mapa con marcador...........1 punto 
+-->
+<html>
+<head>
+<style>
+.estilo_mapa
+{
+height: 250px;
+width: 250px
+}
+</style>
+<!--Pongo espacioes en el key-->
+<script
+      src="https://maps.googleapis.com/maps/api/js?key=A I z a S y A 2 n n T w x I _ 6 v 6 F g Z Q _ H Y A L b k W s L 3 q h F j T 4"
+      defer
+    ></script>
+<script>
+function peticionColegios()
+{
+var objeto_xhr=new XMLHttpRequest();
+objeto_xhr.onreadystatechange=function()
+	{
+	if(this.readyState==4 && this.status==200)
+		{
+		extraerNombrePosicion(this.responseText);
+		}
+	}
+	objeto_xhr.open("GET", "https://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=json&file=0&filename=202311-0-colegios-publicos&mgmtid=78da52c974fb3410VgnVCM2000000c205a0aRCRD&preview=full", true);
+	objeto_xhr.send();
+}
+
+function extraerNombrePosicion(texto)
+{
+var obj_json=JSON.parse(texto);
+var lista_colegios=obj_json["@graph"];
+var lista_objetos_colegio=new Array();//Se inicializa fuera del bucle porque si no, dentro se crearía y machacaría  continuamente
+for (i=0; i<lista_colegios.length; i++)
+	{
+	var nombre=lista_colegios[i].title;
+	var latitud=lista_colegios[i].location.latitude;
+	var longitud=lista_colegios[i].location.longitude;
+	//lista_objetos_colegio[i]={n:nombre, lat: latitud, lng: longitud}
+	lista_objetos_colegio.push({n:nombre, lat: latitud, lng: longitud});
+	}
+pintarTabla(lista_objetos_colegio);	
+pintarTablaMapa(lista_objetos_colegio);
+}
+
+
+function pintarTabla(lista_coles)
+{
+var obj_tabla=document.createElement("table");
+	for(i=0; i<lista_coles.length; i++)
+	{
+	var objeto_fila=document.createElement("tr");
+	var obj_columna_nombre=document.createElement("td");
+	var obj_columna_latitud=document.createElement("td");
+	var obj_columna_longitud=document.createElement("td");
+	obj_columna_nombre.innerText=lista_coles[i].n;
+	obj_columna_latitud.innerText=lista_coles[i].lat;
+	obj_columna_longitud.innerText=lista_coles[i].lng;
+	objeto_fila.appendChild(obj_columna_nombre);
+	objeto_fila.appendChild(obj_columna_latitud);
+	objeto_fila.appendChild(obj_columna_longitud);
+	obj_tabla.appendChild(objeto_fila);
+	}
+	document.body.appendChild(obj_tabla);
+}
+
+function pintarTablaMapa(lista_coles)
+{
+var obj_tabla=document.createElement("table");
+for(i=0; i<lista_coles.length; i++)
+	{
+	var capa_mapa=document.createElement("div");
+	capa_mapa.className="estilo_mapa";
+	capa_mapa.id="mapa_"+i;
+	var objeto_fila=document.createElement("tr");
+	var obj_columna_nombre=document.createElement("td");
+	var obj_columna_mapa=document.createElement("td");
+	obj_columna_nombre.innerText=lista_coles[i].n;
+	obj_columna_mapa.appendChild(capa_mapa);
+	objeto_fila.appendChild(obj_columna_nombre);
+	objeto_fila.appendChild(obj_columna_mapa);
+	obj_tabla.appendChild(objeto_fila);
+	}
+	document.body.appendChild(obj_tabla);
+	pintarMapa(lista_coles);
+}
+function pintarMapa(lista_coles)	
+{
+for (i=0; i<lista_coles.length; i++)
+{
+var latitud=lista_coles[i].lat;
+var longitud=lista_coles[i].lng;
+var nombre_capa="mapa_"+i;
+			var mi_mapa = new google.maps.Map(document.getElementById(nombre_capa), {
+					center: {
+					  lat: latitud*1,
+					  lng: longitud*1
+					},
+					zoom: 10
+				  });
+				  
+					   var marker = new google.maps.Marker({
+			position: {lat: latitud*1, lng:1*longitud},
+			map: mi_mapa
+			
+		  });
+}
+}
+</script>
+</head>
+<body>
+<button onclick="peticionColegios();">Clica para ver los colegios</button>
+</body>
+</html>
